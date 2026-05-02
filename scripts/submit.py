@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 
 KEY_ID = os.environ["ASC_KEY_ID"]
 ISSUER = os.environ["ASC_ISSUER_ID"]
-KEY_PATH = os.path.expanduser(f"~/private_keys/AuthKey_{KEY_ID}.p8")
+KEY_PATH = os.path.expanduser(f"~/.appstoreconnect/private_keys/AuthKey_{KEY_ID}.p8")
 BUNDLE_ID = "com.tokyonasu.ArcanaWeather"
 BASE = "https://api.appstoreconnect.apple.com/v1"
 
