@@ -29,6 +29,10 @@ struct ArcanaCard: Identifiable {
     let sephira: String
     let element: String
     let practice: String
+
+    var imageName: String {
+        "tarot-" + name.lowercased().replacingOccurrences(of: " ", with: "-")
+    }
 }
 
 struct ForecastDay: Identifiable {

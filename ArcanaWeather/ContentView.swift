@@ -117,14 +117,23 @@ struct ContentView: View {
 
     private var skyPanel: some View {
         VStack(spacing: 14) {
-            SigilView()
-                .frame(width: 164, height: 164)
+            Image(viewModel.card.imageName)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(maxHeight: 240)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .shadow(color: .yellow.opacity(0.3), radius: 12)
 
             VStack(spacing: 3) {
                 Text(viewModel.condition)
                     .foregroundStyle(.teal)
                 Text(viewModel.temperature)
                     .font(.system(size: 72, weight: .ultraLight))
+                Text(viewModel.interpretation)
+                    .font(.caption)
+                    .foregroundStyle(.primary.opacity(0.7))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 8)
                 Text(viewModel.details)
                     .font(.caption)
                     .foregroundStyle(.secondary)
