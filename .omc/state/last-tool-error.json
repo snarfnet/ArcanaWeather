@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"ls C:/Users/Windows/private_keys/ 2>/dev/null; ls C:/Users/Windows/AppData/Local/Temp/asc_key.p8 2>/dev/null; ls C:/Users/Windows/*.p8 2>/dev/null; ls C:/Users/Windows/FutsunoNews/*.p8 2>/...",
+  "error": "Exit code 2\nC:/Users/Windows/AppData/Local/Temp/asc_key.p8\nC:/Users/Windows/asc_key.p8",
+  "timestamp": "2026-05-02T04:35:41.913Z",
+  "retry_count": 1
+}
