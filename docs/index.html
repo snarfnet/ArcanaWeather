@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arcana Weather</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, sans-serif; background: #0a0a0f; color: #e8e8e8; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
+h1 { font-size: 2.4rem; font-weight: 300; letter-spacing: 0.15em; margin-bottom: 8px; color: #ffd700; }
+.sub { color: #5ecfcf; font-size: 0.9rem; margin-bottom: 32px; }
+.desc { max-width: 480px; text-align: center; line-height: 1.8; font-size: 0.95rem; color: #b8b8b8; margin-bottom: 40px; }
+.features { max-width: 480px; text-align: left; }
+.features li { padding: 6px 0; color: #c8c8c8; list-style: none; }
+.features li::before { content: "\2726 "; color: #ffd700; }
+a { color: #5ecfcf; }
+footer { margin-top: 48px; font-size: 0.75rem; color: #666; }
+</style>
+</head>
+<body>
+<h1>ARCANA WEATHER</h1>
+<p class="sub">天気 x タロット x 内省</p>
+<p class="desc">
+空を読む。カードを引く。自分を知る。<br>
+Open-Meteoのリアルタイム天気と大アルカナ22枚が交差する、新しい天気アプリ。
+</p>
+<ul class="features">
+<li>リアルタイム天気（Open-Meteo API）</li>
+<li>GPS現在地 + 5都市プリセット</li>
+<li>天気に連動するタロット・ルーン・セフィラ</li>
+<li>5日間予報と象徴的オーメン</li>
+<li>日記機能（日別記録、カードと天気を自動保存）</li>
+</ul>
+<footer>
+<a href="privacy.html">プライバシーポリシー</a> | tokyonasu
+</footer>
+</body>
+</html>

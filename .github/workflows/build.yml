@@ -1,0 +1,92 @@
+name: Build and Upload to App Store
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode 26
+        run: sudo xcode-select -s /Applications/Xcode_26.0.app || sudo xcode-select -s /Applications/Xcode_16.2.app || sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Set build number
+        run: echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Patch Info.plist build number
+        run: |
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" ArcanaWeather/Info.plist
+
+      - name: Import Distribution Certificate
+        env:
+          DIST_CERT_BASE64: ${{ secrets.DIST_CERT_BASE64 }}
+          DIST_CERT_PASSWORD: ${{ secrets.DIST_CERT_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          CERT_PATH=$RUNNER_TEMP/dist_cert.p12
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          echo -n "$DIST_CERT_BASE64" | base64 --decode -o $CERT_PATH
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security import $CERT_PATH -P "$DIST_CERT_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
+
+      - name: Set up ASC API Key
+        env:
+          ASC_API_KEY_CONTENT: ${{ secrets.ASC_API_KEY_CONTENT }}
+        run: |
+          mkdir -p ~/private_keys
+          echo "$ASC_API_KEY_CONTENT" > ~/private_keys/AuthKey_T962B2FMPW.p8
+
+      - name: Build Archive
+        run: |
+          xcodebuild archive \
+            -project ArcanaWeather.xcodeproj \
+            -scheme ArcanaWeather \
+            -configuration Release \
+            -archivePath $RUNNER_TEMP/ArcanaWeather.xcarchive \
+            -destination "generic/platform=iOS" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/private_keys/AuthKey_T962B2FMPW.p8 \
+            -authenticationKeyID T962B2FMPW \
+            -authenticationKeyIssuerID 4b1a99e8-55ae-4844-a4ea-82e1febf1127 \
+            CODE_SIGN_STYLE=Automatic \
+            DEVELOPMENT_TEAM=83VGKGSQUH \
+            CURRENT_PROJECT_VERSION=$BUILD_NUMBER
+
+      - name: Export IPA
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath $RUNNER_TEMP/ArcanaWeather.xcarchive \
+            -exportPath $RUNNER_TEMP/export \
+            -exportOptionsPlist export_options.plist \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath ~/private_keys/AuthKey_T962B2FMPW.p8 \
+            -authenticationKeyID T962B2FMPW \
+            -authenticationKeyIssuerID 4b1a99e8-55ae-4844-a4ea-82e1febf1127
+
+          xcrun altool --upload-app \
+            -f $RUNNER_TEMP/export/ArcanaWeather.ipa \
+            -t ios \
+            --apiKey T962B2FMPW \
+            --apiIssuer 4b1a99e8-55ae-4844-a4ea-82e1febf1127
+
+      - name: Install PyJWT
+        run: pip3 install pyjwt
+
+      - name: Submit for Review
+        env:
+          ASC_KEY_ID: T962B2FMPW
+          ASC_ISSUER_ID: 4b1a99e8-55ae-4844-a4ea-82e1febf1127
+        run: python3 scripts/submit.py
