@@ -251,18 +251,23 @@ struct ContentView: View {
                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.12)))
 
                 Button {
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                     journal.save(text: journalText, card: viewModel.card.nameJP, condition: viewModel.condition)
                     journalSaved = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) { journalSaved = false }
                 } label: {
-                    Text(journalSaved ? "保存しました ✓" : "保存")
+                    Text(journalSaved ? "保存しました" : "保存")
                         .font(.subheadline)
                         .fontWeight(.semibold)
+                        .foregroundStyle(journalSaved ? Color.green : Color.teal)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
-                        .background(journalSaved ? Color.green.opacity(0.28) : Color.teal.opacity(0.22), in: RoundedRectangle(cornerRadius: 8))
+                        .background(journalSaved ? Color.green.opacity(0.18) : Color.teal.opacity(0.18))
+                        .cornerRadius(8)
                         .overlay(RoundedRectangle(cornerRadius: 8).stroke(journalSaved ? Color.green.opacity(0.65) : Color.teal.opacity(0.65)))
                 }
+                .buttonStyle(.plain)
+                .contentShape(Rectangle())
                 .animation(.easeInOut(duration: 0.2), value: journalSaved)
             }
 
